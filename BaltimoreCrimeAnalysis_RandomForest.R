@@ -234,7 +234,7 @@ ggplot(data = subset(states, region == c("maryland")), mapping = aes(x = long, y
   geom_point(data=crime_dat_miss,aes(x = crime_dat_miss$Longitude, y = crime_dat_miss$Latitude,group=crime_dat_miss$Description),pch=21, size=1, alpha=I(0.005)) + 
   coord_fixed(xlim = c(-76.71162, -76.5285),  ylim = c(39.20041, 39.37293) ) 
 
-register_google(key = "AIzaSyDjLgqH4IJJdmQyBIVHKlB7eaacFYS9fV4", write = TRUE)
+register_google(key = "xxxxxxxxxx", write = TRUE)
 
 
 clusplot(CrimeCluster, CrimeCluster$cluster, color=TRUE, shade=TRUE,labels=2, lines=0)
