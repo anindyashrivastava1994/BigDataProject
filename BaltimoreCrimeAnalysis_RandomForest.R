@@ -77,6 +77,17 @@ ggplot(crime_count_hourofday, aes(x = hour, y = n,
                       group = Crime,
                       colour = Crime)) +
   geom_line()
+
+#Inside vs Outside
+ggplot(data =crime_dat[!is.na(crime_dat$Inside.Outside),] , aes(x = Inside.Outside, fill= Description))+
+  geom_bar(position = 'dodge') +
+  labs(title = "Number of incidents by Crime Group\n", x = "Inside or Outside", y = "Number", color = "Crime Group\n")
+
+#Crime by weapon
+ggplot(data=crime_dat , aes(Weapon)) + 
+  geom_bar(aes(y = (..count..)/sum(..count..)), fill='Blue', color='Black') + 
+  labs(x= "Weapon Type", y="Number of Incident") 
+
 #Getting crime by hour of day
 crime_count_hourofday_1 <- temporary_dataset_2 %>% group_by(Crime) %>% filter(hour=="1")%>% tally() %>% arrange(desc(n))
 crime_count_hourofday_2 <- temporary_dataset_2 %>% group_by(Crime) %>% filter(hour=="2")%>% tally() %>% arrange(desc(n))
