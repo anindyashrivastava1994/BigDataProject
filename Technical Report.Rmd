@@ -1,0 +1,129 @@
+---
+title: "Technical Report - BCD"
+author: "Jada, Anindya, Vincent, Utkarsh"
+date: "12/10/2019"
+output:
+  html_document: default
+  pdf_document: default
+---
+Official Technical Report
+Listed below is the output of out analysis and the coding used to achieve it. 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Geographic Dispersion
+```{r, out.width = '100%', echo = FALSE}
+knitr::include_graphics('Rplot_baltimore.jpeg')
+```
+
+``
+E.G. `BaltimoreMap <- get_map(location = c(min(-76.625), max(39.3)),zoom=12)
+ggmap(BaltimoreMap) + geom_point(aes(x = Longitude, y = Latitude, colour = as.factor(crime_dat_miss$Crime)),data = crime_dat_miss,size=1) +
+  ggtitle("Crime Distribution")+labs(color="Crime")``
+  
+# Crime by District
+```{r, out.width = '100%', echo = FALSE}
+knitr::include_graphics('District Data-page-001.jpg')
+```
+``
+E.G. `unique(crime_dat$District)
+#Bar Plot of description and count per year 
+ggplot(crime_count,aes(Description,n)) + geom_bar(stat="identity")``
+
+``#Analyzing by district
+crime_district<-crime_dat[,c("District","year","CrimeCode","Description")] %>% group_by(District)``
+
+``#Crime count by district
+crime_count_district<-crime_district %>%  group_by(District) %>% tally() %>% arrange(desc(n))
+ggplot(crime_count_district,aes(District,n,fill=District)) + geom_bar(stat="identity")``
+
+
+```{r, out.width = '100%', echo = FALSE}
+knitr::include_graphics('Inside v Outside-page-001.jpg')
+```
+``
+E.G. `ggplot(data =crime_dat[!is.na(crime_dat$Inside.Outside),] , aes(x = Inside.Outside, fill= Description))+
+  geom_bar(position = 'dodge') +
+  labs(title = "Number of incidents by Crime Group\n", x = "Inside or Outside", y = "Number", color = "Crime Group\n")``
+
+# Crime by Month
+```{r, out.width = '100%', echo = FALSE}
+knitr::include_graphics('Month Data-page-001.jpg')
+```
+``
+E.G. `#Crime count by month
+temporary_dataset<-crime_dat[,c("month","CrimeCode","Description")]
+crime_month <- temporary_dataset %>% group_by(month) %>% tally() 
+ggplot(crime_month,aes(month,n,fill=month)) + geom_bar(stat="identity")``
+
+
+# Crime Based on Weapon
+```{r, out.width = '100%', echo = FALSE}
+knitr::include_graphics('Weapon Data-page-001.jpg')
+```
+``E.G. `ggplot(data=crime_dat , aes(Weapon)) + 
+  geom_bar(aes(y = (..count..)/sum(..count..)), fill='Blue', color='Black') + 
+  labs(x= "Weapon Type", y="Number of Incident")``
+  
+```{r, out.width = '100%', echo = FALSE}
+knitr::include_graphics('Week Day Data-page-001.jpg')
+```
+``E.G. `#Classifying Data into violent crime and not
+crime_dat_miss$CrimeViolent <- ifelse(crime_dat_miss$Description =="ROBBERY - CARJACKING", "0", ifelse(crime_dat_miss$Description =="ROBBERY - COMMERCIAL", "0", ifelse(crime_dat_miss$Description =="ROBBERY - RESIDENCE", "0", ifelse(crime_dat_miss$Description =="ROBBERY - STREET", "0", ifelse(crime_dat_miss$Description =="LARCENY FROM AUTO", "0",ifelse(crime_dat_miss$Description =="AGG. ASSAULT", "1",ifelse(crime_dat_miss$Description =="ARSON", "0",ifelse(crime_dat_miss$Description =="AUTO THEFT", "0",ifelse(crime_dat_miss$Description =="BURGLARY", "0",ifelse(crime_dat_miss$Description =="COMMON ASSAULT", "1",ifelse(crime_dat_miss$Description =="HOMICIDE", "1",ifelse(crime_dat_miss$Description =="RAPE", "1",ifelse(crime_dat_miss$Description =="SHOOTING", "1",ifelse(crime_dat_miss$Description =="LARCENY", "0",NA ) ) ) ) ) ) ) ) ) )))))
+crime_dat_miss$DayOfWeek <- as.character(crime_dat_miss$DayOfWeek)
+crime_dat_miss$DayOfWeek <- with(crime_dat_miss,  ifelse(day=="Monday", "1",
+                                                         ifelse(day=="Tuesday", "2",
+                                                                ifelse(day=="Wednesday", "3",
+                                                                       ifelse(day=="Thursday", "4",
+                                                                              ifelse(day=="Friday", "5",
+                                                                                     ifelse(day=="Saturday", "6","7")))))))``
+
+
+``crime_dat_miss$month <- as.numeric(crime_dat_miss$month)
+crime_dat_miss$Season <- ifelse(crime_dat_miss$month <="3", "S1", ifelse(crime_dat_miss$month <= "6", "S2", ifelse(crime_dat_miss$month <="9", "S3", "S4")))
+crime_dat_miss$Season <- as.factor(crime_dat_miss$Season)
+crime_dat_miss$WeekdayCheck <- ifelse(crime_dat_miss$DayOfWeek <"6", "0", "1")
+crime_dat_miss$WeekdayCheck <- as.factor(crime_dat_miss$WeekdayCheck)``
+
+``crime_dat_miss$CrimeViolent <- as.factor(crime_dat_miss$CrimeViolent)
+crime_dat_miss$TimeOfDay <- as.factor(crime_dat_miss$TimeOfDay)
+count(crime_dat_miss[crime_dat_miss$CrimeViolent=="1",])``
+``#crime_dat_miss$Location <- as.factor(crime_dat_miss$Location)``
+
+```{r, out.width = '100%', echo = FALSE}
+knitr::include_graphics('GGMAP.png')
+
+```
+
+
+``E.G. `install.packages("ggmap")
+library(ggmap)``
+
+
+``#ggmap``
+
+``calc_zoom(mean(Longitude), mean(Latitude), crime_dat_miss, adjust = 0, f = 0.05)
+box <- make_bbox(Longitude, Latitude, data = crime_dat_miss)
+calc_zoom(box)``
+
+``BaltimoreMap <- get_map(location = c(min(-76.625), max(39.3)),zoom=12)
+ggmap(BaltimoreMap) + geom_point(aes(x = Longitude, y = Latitude, colour = as.factor(crime_dat_miss$Description)),data = crime_dat_miss,size=1) +
+  ggtitle("Crime Distribution")+labs(color="Crime")`` 
+
+``######################
+ggplot(data = subset(states, region == c("maryland")), mapping = aes(x = long, y = lat, group = group)) + coord_fixed(1.3) + 
+  geom_polygon(color = "black", fill = "gray") +
+  geom_point(data=crime_dat_miss,aes(x = crime_dat_miss$Longitude, y = crime_dat_miss$Latitude,group=crime_dat_miss$Description),pch=21, size=1, alpha=I(0.005)) + 
+ coord_fixed(xlim = c(-76.71162, -76.5285),  ylim = c(39.20041, 39.37293) )`` 
+
+``register_google(key = "AIzaSyDjLgqH4IJJdmQyBIVHKlB7eaacFYS9fV4", write = TRUE)``
+
+ 
+``clusplot(CrimeCluster, CrimeCluster$cluster, color=TRUE, shade=TRUE,labels=2, lines=0)
+plotcluster(CrimeCluster, CrimeCluster$cluster)``
+
+# Random Forest Outcome
+```{r, out.width = '100%', echo = FALSE}
+knitr::include_graphics('E.jpg')
+```
+``E.G. model <- randomForest(CrimeViolent ~ DayOfWeek + Season + Latitude + Longitude + hour + District, data=crime_dat_miss, ntree=200)``
